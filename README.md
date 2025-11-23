@@ -29,3 +29,12 @@ Per utilizzare il progetto sul tuo ambiente locale:
 1. Clona la repository:
    ```bash
    git clone https://github.com/18Michele2025/18michele2025.github.io
+2. Configura EmailJS con le tue credenziali:
+   - `EMAILJS_PUBLIC_KEY`
+   - `EMAILJS_SERVICE_ID`
+   - `EMAILJS_TEMPLATE_ID`
+
+3. Configura Cloudinary con:
+   - `CLOUDINARY_CLOUD_NAME`
+   - `CLOUDINARY_UPLOAD_PRESET`
+
