@@ -1,4 +1,4 @@
-/* -------------------------------
+/* ------------------------------- WIP
         CONFIGURAZIONE
 --------------------------------*/
 
@@ -68,35 +68,40 @@ function startTimer(){
 
 function stopTimer(){ clearInterval(timerInterval); }
 
-function drawWaveDummy(){ // placeholder, non necessario con Recorder.js
-    resetCanvas();
-}
+function drawWaveDummy(){ resetCanvas(); }
 
 /* -------------------------------
         BUTTON EVENTS
 --------------------------------*/
 startBtn.addEventListener('click', async () => {
     resetRecordingState();
+
     try{
+        // Chiedi permesso microfono
         stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+        // Crea AudioContext e sorgente
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        await audioCtx.resume(); // importante su iOS
+
+        const source = audioCtx.createMediaStreamSource(stream);
+
+        // Inizializza Recorder.js
+        recorder = new Recorder(source, { numChannels: 1 });
+        recorder.record();
+
+        // UI
+        statusEl.textContent = '🎙️ Registrazione in corso...';
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        sendBtn.disabled = true;
+        player.style.display = 'none';
+        startTimer();
+
     }catch(err){
-        statusEl.textContent = 'Permesso microfono negato';
-        return;
+        console.error(err);
+        statusEl.textContent = '❌ Permesso microfono negato o errore: ' + err.message;
     }
-
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const source = audioCtx.createMediaStreamSource(stream);
-    drawWaveDummy();
-
-    recorder = new Recorder(source, { numChannels:1 });
-    recorder.record();
-
-    statusEl.textContent = '🎙️ Registrazione in corso...';
-    startBtn.disabled = true;
-    stopBtn.disabled = false;
-    sendBtn.disabled = true;
-    player.style.display = 'none';
-    startTimer();
 });
 
 stopBtn.addEventListener('click', () => {
@@ -112,9 +117,10 @@ stopBtn.addEventListener('click', () => {
             statusEl.textContent = '❌ Registrazione vuota';
             return;
         }
+
         const url = URL.createObjectURL(blob);
         player.src = url;
-        player.load(); // importante su iPhone
+        player.load(); // necessario su iPhone
         player.style.display = 'block';
         statusEl.textContent = '⏳ Upload su Cloudinary...';
 
