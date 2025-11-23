@@ -25,6 +25,17 @@ const timerEl  = document.getElementById('timer');
 const canvas   = document.getElementById('wave');
 const ctx      = canvas.getContext('2d');
 
+// Pulsante riascolto per iOS
+let playBtn = document.getElementById('play');
+if(!playBtn){
+    playBtn = document.createElement('button');
+    playBtn.id = 'play';
+    playBtn.className = 'btn ghost';
+    playBtn.style.display = 'none';
+    playBtn.textContent = '▶️ Riascolta';
+    startBtn.parentNode.appendChild(playBtn);
+}
+
 /* -------------------------------
         VARIABILI DI STATO
 --------------------------------*/
@@ -78,6 +89,7 @@ function resetRecordingState(){
     canSend = false;
     player.src = "";
     player.style.display = 'none';
+    playBtn.style.display = 'none';
     startBtn.disabled = false;
     stopBtn.disabled = true;
     sendBtn.disabled = true;
@@ -115,6 +127,7 @@ startBtn.addEventListener('click', async () => {
         stopBtn.disabled = false;
         sendBtn.disabled = true;
         player.style.display = 'none';
+        playBtn.style.display = 'none';
         startTimer();
     };
 
@@ -125,7 +138,11 @@ startBtn.addEventListener('click', async () => {
         player.src = url;
         player.load();
         player.style.display = 'block';
+        playBtn.style.display = 'inline-block';
         statusEl.textContent = '⏳ Upload su Cloudinary...';
+
+        // Gestione riascolto iOS
+        playBtn.onclick = () => player.play();
 
         try{
             const formData = new FormData();
@@ -188,6 +205,7 @@ sendBtn.addEventListener('click', async () => {
         uploadedURL = "";
         player.src = "";
         player.style.display = 'none';
+        playBtn.style.display = 'none';
         player.load();
         startBtn.disabled = false;
         stopBtn.disabled = true;
